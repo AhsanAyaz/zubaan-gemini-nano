@@ -15,6 +15,7 @@
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(.5,0,.5,1) infinite;
   border-color: oklch(0.6569 0.196 275.75) transparent transparent transparent;
+  @apply border-t-primary;
 }
 
 .lds-ring div:nth-child(1) {
