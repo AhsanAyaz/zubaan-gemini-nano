@@ -114,7 +114,7 @@ const Chat = () => {
             setIsLoading(false);
           }
         }}
-        className="btn btn-primary"
+        className="btn btn-secondary"
       >
         Summarize
       </button>
@@ -165,9 +165,9 @@ const Chat = () => {
         }}
         value={prompt}
         placeholder="What do you need translated?"
-        className="mt-4 textarea textarea-bordered textarea-lg w-full"
+        className="mt-4 placeholder:text-gray-500 focus:ring-primary focus:ring-1 textarea textarea-bordered textarea-lg w-full"
       ></textarea>
-      <button disabled={listening} type="submit" className="btn">
+      <button disabled={listening} type="submit" className="btn btn-primary">
         Submit
       </button>
     </form>
