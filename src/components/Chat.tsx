@@ -37,22 +37,29 @@ const Chat = () => {
     setTimeout(() => {
       setPrompt("");
     }, 0);
-    const resp = await translateText({
-      sourceLanguage: sourceLanguage.name,
-      targetLang: targetLanguage.name,
-      prompt: message,
-      provider: AIProvider.GeminiNano,
-    });
-    console.log({ resp });
-    setMessages((messages) => {
-      return [
-        ...messages,
-        {
-          text: resp[0].message.content!,
-          by: "ai",
-        },
-      ];
-    });
+    try {
+      setIsLoading(true);
+      const resp = await translateText({
+        sourceLanguage: sourceLanguage.name,
+        targetLang: targetLanguage.name,
+        prompt: message,
+        provider: AIProvider.GeminiNano,
+      });
+      console.log({ resp });
+      setMessages((messages) => {
+        return [
+          ...messages,
+          {
+            text: resp[0].message.content!,
+            by: "ai",
+          },
+        ];
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <form
@@ -68,15 +75,7 @@ const Chat = () => {
           dictaphoneRef.current?.click();
           return;
         }
-
-        try {
-          setIsLoading(true);
-          await sendMessage();
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setIsLoading(false);
-        }
+        await sendMessage();
       }}
     >
       <div className="flex flex-col">
