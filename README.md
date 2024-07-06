@@ -10,3 +10,9 @@ After then, you should turn on these flags:
 * [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
 * [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model): `Enabled BypassPrefRequirement`
 * [chrome://components/](chrome://components/): Click `Optimization Guide On Device Model` to download the model.
+
+> Note: The `Optimization Guide On Device Model` may not show up. What worked for me was opening the devtools and trying out the following:
+> 
+> ```await ai.canCreateTextSession()```
+>
+> I could see the option afterwards
