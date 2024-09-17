@@ -21,6 +21,7 @@ export const LANGUAGES: ZubaanLanguage[] = [
   { name: "Italian", code: "it" },
   { name: "Turkish", code: "tr" },
   { name: "Dutch", code: "nl" },
+  { name: "Tamil", code: "ta" },
+  { name: "Malayalam", code: "ml" },
+  { name: "Telugu", code: "te" },
 ];
-
-
