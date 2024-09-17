@@ -1,21 +1,28 @@
 import { useRef, useState } from "react";
 import LanguagePicker from "./LanguagePicker";
 import Dictaphone from "./Dictaphone";
-import { LANGUAGES, ZubaanLanguage } from "../utils/languages";
+import { ZubaanLanguage } from "../utils/languages";
 import { translateText, summarizeConversation, AIProvider } from "../api/ai";
 import Loader from "./Loader";
+import {
+  getSavedLanguages,
+  saveSrcLanguage,
+  saveTargetLanguage,
+} from "../utils/storage-helper";
 
 type Message = {
   text: string;
   by: "user" | "ai";
 };
 
+const languagesFromStorage = getSavedLanguages();
+
 const Chat = () => {
   const [sourceLanguage, setSourceLanguage] = useState<ZubaanLanguage>(
-    LANGUAGES[0]
+    languagesFromStorage.sourceLanguage,
   );
   const [targetLanguage, setTargetLanguage] = useState<ZubaanLanguage>(
-    LANGUAGES[1]
+    languagesFromStorage.targetLanguage,
   );
   const [prompt, setPrompt] = useState("");
 
@@ -24,6 +31,18 @@ const Chat = () => {
   const [listening, setListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleTextAreaKeyUp = async (
+    ev: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) => {
+    if (dictaphoneRef.current?.classList.contains("microphone")) {
+      dictaphoneRef.current?.click();
+      return;
+    }
+    const key = ev.key;
+    if (key === "Enter" && !ev.shiftKey && !ev.ctrlKey) {
+      await sendMessage();
+    }
+  };
   const sendMessage = async (message: string = prompt) => {
     setMessages((messages) => {
       return [
@@ -61,6 +80,7 @@ const Chat = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <form
       className="flex flex-col gap-4 py-10"
@@ -84,6 +104,7 @@ const Chat = () => {
           label={"Source Language"}
           onChange={(lang: ZubaanLanguage) => {
             setSourceLanguage(lang);
+            saveSrcLanguage(lang);
           }}
         />
         <LanguagePicker
@@ -91,6 +112,7 @@ const Chat = () => {
           label={"Target Language"}
           onChange={(lang: ZubaanLanguage) => {
             setTargetLanguage(lang);
+            saveTargetLanguage(lang);
           }}
         />
       </div>
@@ -163,8 +185,9 @@ const Chat = () => {
         onChange={(ev) => {
           setPrompt(ev.target.value);
         }}
+        onKeyUp={(ev) => handleTextAreaKeyUp(ev)}
         value={prompt}
-        placeholder="What do you need translated?"
+        placeholder={`What do you need translated?\nPress Shift+Enter for new line`}
         className="mt-4 placeholder:text-gray-500 focus:ring-primary focus:ring-1 textarea textarea-bordered textarea-lg w-full"
       ></textarea>
       <button disabled={listening} type="submit" className="btn btn-primary">

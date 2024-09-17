@@ -34,24 +34,28 @@ export async function summarizeConversation({
   prompt,
   provider,
 }: AIParams): Promise<AIResponse> {
-  const responses = await Promise.all([sourceLanguage, targetLang].map(async (lang) => {
-    const finalPrompt = `Create a summary of all the content (source and translated) in language ${lang} from this JSON array. ${prompt}`;
-    const result = await processPrompt(finalPrompt, provider);
-    if (!result.length) {
-      return {
-        message: {
-          content: ''
-        }
-      };
-    }
-    return result[0].message.content
-  }))
+  const responses = await Promise.all(
+    [sourceLanguage, targetLang].map(async (lang) => {
+      const finalPrompt = `Create a summary of all the content (source and translated) in language ${lang} from this JSON array. ${prompt}`;
+      const result = await processPrompt(finalPrompt, provider);
+      if (!result.length) {
+        return {
+          message: {
+            content: "",
+          },
+        };
+      }
+      return result[0].message.content;
+    }),
+  );
 
-  return [{
-    message: {
-      content: responses.join(',')
-    }
-  }];
+  return [
+    {
+      message: {
+        content: responses.join(","),
+      },
+    },
+  ];
 }
 
 const processPrompt = async (prompt: string, provider: AIProvider) => {
@@ -67,7 +71,7 @@ const processPrompt = async (prompt: string, provider: AIProvider) => {
     // return completion.choices;
     case AIProvider.GeminiNano:
     default:
-      const session = await ai.createTextSession();
+      const session = await ai.assistant.create();
       const result = await session.prompt(prompt);
       setTimeout(() => {
         session.destroy();
@@ -80,4 +84,5 @@ const processPrompt = async (prompt: string, provider: AIProvider) => {
         },
       ];
   }
-}
+};
+
