@@ -1,4 +1,4 @@
-declare let ai: any;
+let session: AIAssistant;
 
 export type AIResponse = Array<{
   message: {
@@ -58,6 +58,31 @@ export async function summarizeConversation({
   ];
 }
 
+export const initSession = async (provider: AIProvider) => {
+  switch (provider) {
+    case AIProvider.GeminiNano:
+      {
+        const isAvailable = (await self.ai?.languageModel?.capabilities?.())
+          ?.available;
+        if (!isAvailable || isAvailable === "no") {
+          alert(
+            "Gemini Nano is not available in your browser. Please see the readme for more information."
+          );
+          return;
+        } else {
+          session = session
+            ? await session.clone()
+            : await self.ai.languageModel.create();
+        }
+      }
+      break;
+  }
+};
+
+export const destroySession = async () => {
+  session?.destroy();
+};
+
 const processPrompt = async (prompt: string, provider: AIProvider) => {
   switch (provider) {
     case AIProvider.ChatGpt:
@@ -72,11 +97,8 @@ const processPrompt = async (prompt: string, provider: AIProvider) => {
     // eslint-disable-next-line no-fallthrough
     case AIProvider.GeminiNano:
     default: {
-      const session = await ai.languageModel.create();
       const result = await session.prompt(prompt);
-      setTimeout(() => {
-        session.destroy();
-      }, 1000);
+      console.log(result);
       return [
         {
           message: {

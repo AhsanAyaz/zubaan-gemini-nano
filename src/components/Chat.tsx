@@ -1,8 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LanguagePicker from "./LanguagePicker";
 import Dictaphone from "./Dictaphone";
 import { ZubaanLanguage } from "../utils/languages";
-import { translateText, summarizeConversation, AIProvider } from "../api/ai";
+import {
+  translateText,
+  summarizeConversation,
+  AIProvider,
+  initSession,
+  destroySession,
+} from "../api/ai";
 import Loader from "./Loader";
 import {
   getSavedLanguages,
@@ -19,10 +25,10 @@ const languagesFromStorage = getSavedLanguages();
 
 const Chat = () => {
   const [sourceLanguage, setSourceLanguage] = useState<ZubaanLanguage>(
-    languagesFromStorage.sourceLanguage,
+    languagesFromStorage.sourceLanguage
   );
   const [targetLanguage, setTargetLanguage] = useState<ZubaanLanguage>(
-    languagesFromStorage.targetLanguage,
+    languagesFromStorage.targetLanguage
   );
   const [prompt, setPrompt] = useState("");
 
@@ -31,8 +37,16 @@ const Chat = () => {
   const [listening, setListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    initSession(AIProvider.GeminiNano);
+
+    return () => {
+      destroySession();
+    };
+  }, []);
+
   const handleTextAreaKeyUp = async (
-    ev: React.KeyboardEvent<HTMLTextAreaElement>,
+    ev: React.KeyboardEvent<HTMLTextAreaElement>
   ) => {
     if (dictaphoneRef.current?.classList.contains("microphone")) {
       dictaphoneRef.current?.click();
