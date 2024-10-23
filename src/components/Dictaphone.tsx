@@ -9,10 +9,20 @@ type DictaphoneProps = {
   sendMessage: (text: string) => void;
   propagateTranscript: (text: string) => void;
   propagateListening: (val: boolean) => void;
+  disabled?: boolean;
 };
 
 const Dictaphone = forwardRef<HTMLButtonElement, DictaphoneProps>(
-  ({ language, sendMessage, propagateTranscript, propagateListening }, ref) => {
+  (
+    {
+      language,
+      sendMessage,
+      propagateTranscript,
+      propagateListening,
+      disabled,
+    },
+    ref
+  ) => {
     const {
       transcript,
       listening,
@@ -65,15 +75,16 @@ const Dictaphone = forwardRef<HTMLButtonElement, DictaphoneProps>(
       <div className="text-center flex flex-col gap-4 items-center">
         <button
           ref={ref}
+          disabled={disabled}
           className={`rounded-full p-6 hover:bg-primary duration-200 ${
             listening ? "bg-primary" : "border border-primary"
-          } ${transcript ? ' microphone' : ''}`}
+          } ${transcript ? " microphone" : ""} ${
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={(ev) => {
             ev.preventDefault();
             ev.stopPropagation();
-            isRunning
-              ? stopListening()
-              : startListening();
+            isRunning ? stopListening() : startListening();
           }}
         >
           {listening ? (
