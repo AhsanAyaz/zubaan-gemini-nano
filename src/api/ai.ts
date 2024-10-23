@@ -114,7 +114,10 @@ export const createSession = async (
           return;
         } else {
           if (sessionType === "translations") {
-            translationsSession = await self.ai.languageModel.create();
+            translationsSession = await self.ai.languageModel.create({
+              topK: 1,
+              temperature: 0.1,
+            });
           } else {
             summarySession = await self.ai.languageModel.create();
           }
