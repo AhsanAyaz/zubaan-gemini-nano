@@ -1,4 +1,4 @@
-declare var ai: any;
+declare let ai: any;
 
 export type AIResponse = Array<{
   message: {
@@ -46,7 +46,7 @@ export async function summarizeConversation({
         };
       }
       return result[0].message.content;
-    }),
+    })
   );
 
   return [
@@ -69,9 +69,10 @@ const processPrompt = async (prompt: string, provider: AIProvider) => {
     //   model: 'gpt-3.5-turbo',
     // });
     // return completion.choices;
+    // eslint-disable-next-line no-fallthrough
     case AIProvider.GeminiNano:
-    default:
-      const session = await ai.assistant.create();
+    default: {
+      const session = await ai.languageModel.create();
       const result = await session.prompt(prompt);
       setTimeout(() => {
         session.destroy();
@@ -83,6 +84,6 @@ const processPrompt = async (prompt: string, provider: AIProvider) => {
           },
         },
       ];
+    }
   }
 };
-
