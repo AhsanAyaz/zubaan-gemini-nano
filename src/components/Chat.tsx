@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useState, useEffect } from "react";
 import LanguagePicker from "./LanguagePicker";
 import Dictaphone from "./Dictaphone";
@@ -14,6 +15,7 @@ import {
   saveSrcLanguage,
   saveTargetLanguage,
 } from "../utils/storage-helper";
+import AudioPlayer from "./AudioPlayer";
 
 type Message = {
   text: string;
@@ -39,9 +41,67 @@ const Chat = () => {
   const [summary, setSummary] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [aiAvailable, setAiAvailable] = useState(false);
+  const worker = useRef<Worker | null>(null);
+  const [output, setOutput] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAiAvailability();
+    const setupWorker = async () => {
+      try {
+        await checkAiAvailability();
+
+        if (!worker.current) {
+          console.log("Initializing worker...");
+          worker.current = new Worker(
+            new URL("../worker.js", import.meta.url),
+            {
+              type: "module",
+            }
+          );
+
+          const onMessageReceived = (e: MessageEvent) => {
+            console.log("Worker message received:", e.data);
+            switch (e.data.status) {
+              case "ready":
+                console.log("Worker is ready to receive messages");
+                break;
+
+              case "complete":
+                console.log("Setting output URL");
+                setOutput(URL.createObjectURL(e.data.output));
+                break;
+
+              case "error":
+                console.error("Worker error:", e.data.error);
+                break;
+
+              default:
+                console.log("Worker message:", e.data);
+            }
+          };
+
+          const onWorkerError = (error: ErrorEvent) => {
+            console.error("Worker error:", error);
+          };
+
+          worker.current.onerror = onWorkerError;
+          worker.current.onmessage = onMessageReceived;
+
+          console.log("Worker event listeners attached");
+        }
+      } catch (error) {
+        console.error("Error setting up worker:", error);
+      }
+    };
+
+    setupWorker();
+
+    return () => {
+      if (worker.current) {
+        console.log("Terminating worker...");
+        worker.current.terminate();
+        worker.current = null;
+      }
+    };
   }, []);
 
   const checkAiAvailability = async () => {
@@ -82,18 +142,29 @@ const Chat = () => {
         prompt: message,
         provider: AIProvider.GeminiNano,
       });
-      console.log({ resp });
-      setMessages((messages) => {
-        return [
-          ...messages,
-          {
-            text: resp[0].message.content!,
-            by: "ai",
-          },
-        ];
-      });
+
+      setMessages((messages) => [
+        ...messages,
+        {
+          text: resp[0].message.content!,
+          by: "ai",
+        },
+      ]);
+
+      if (worker.current) {
+        console.log("Sending message to worker:", {
+          text: resp[0].message.content,
+        });
+
+        worker.current.postMessage({
+          text: resp[0].message.content,
+          language: targetLanguage.llmModelId,
+        });
+      } else {
+        console.error("Worker not initialized");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error in sendMessage:", error);
     } finally {
       setIsLoading(false);
     }
@@ -279,6 +350,7 @@ const Chat = () => {
           </div>
         </div>
       )}
+      {output && <AudioPlayer audioUrl={output} mimeType={"audio/wav"} />}
     </>
   );
 };
