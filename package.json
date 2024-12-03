@@ -18,7 +18,8 @@
     "react-router-dom": "^6.24.0",
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.14.1",
-    "wavefile": "^11.0.0"
+    "wavefile": "^11.0.0",
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

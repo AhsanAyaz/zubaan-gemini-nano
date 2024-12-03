@@ -30,7 +30,7 @@ const Dictaphone = forwardRef<HTMLButtonElement, DictaphoneProps>(
       browserSupportsSpeechRecognition,
     } = useSpeechRecognition();
     const [isRunning, setIsRunning] = useState(false);
-    const [timer, setTimer] = useState(0);
+    const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
 
     useEffect(() => {
       if (isRunning && transcript) {
@@ -44,7 +44,7 @@ const Dictaphone = forwardRef<HTMLButtonElement, DictaphoneProps>(
           }, 2000)
         );
       }
-    }, [transcript, propagateTranscript]);
+    }, [transcript]);
 
     useEffect(() => {
       propagateListening(listening);

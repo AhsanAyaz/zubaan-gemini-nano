@@ -23,6 +23,7 @@ export default function AudioPlayer({
       <audio
         ref={audioPlayer}
         controls
+        autoPlay={true}
         className="w-full h-14 rounded-lg bg-white shadow-xl shadow-black/5 ring-1 ring-slate-700/10"
       >
         <source ref={audioSource} type={mimeType}></source>
