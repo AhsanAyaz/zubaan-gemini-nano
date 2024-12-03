@@ -41,7 +41,11 @@ export async function translateText({
   if (!isGeminiNanoAvailable) {
     throw new Error("Gemini Nano is not available in your browser.");
   }
-  const finalPrompt = `Translate the following into ${targetLang} from ${sourceLanguage}: ${prompt}`;
+  const finalPrompt = `
+  You are an expert translation helper, proficient in many languages.
+  Provide exact translations of the sentences from source language to target language.
+  Do not add anything extra.
+  Translate the following into ${targetLang} from ${sourceLanguage}: ${prompt}`;
   return processPrompt(finalPrompt, provider);
 }
 

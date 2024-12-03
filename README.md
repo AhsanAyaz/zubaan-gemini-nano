@@ -10,9 +10,13 @@ After then, you should turn on these flags:
 * [chrome://flags/#prompt-api-for-gemini-nano](chrome://flags/#prompt-api-for-gemini-nano): `Enabled`
 * [chrome://flags/#optimization-guide-on-device-model](chrome://flags/#optimization-guide-on-device-model): `Enabled BypassPrefRequirement`
 * [chrome://components/](chrome://components/): Click `Optimization Guide On Device Model` to download the model.
+* Also disable the [Text Safety Classifier (chrome://flags/#text-safety-classifier)](chrome://flags/#text-safety-classifier) flag as well
 
 > Note: The `Optimization Guide On Device Model` may not show up. What worked for me was opening the devtools and trying out the following:
 > 
-> ```await ai.canCreateTextSession()```
+> ```await ai.languageModel.create();```
 >
 > I could see the option afterwards
+>
+> You can verify by running `(await window.ai.languageModel.capabilities()).available`.
+> If it says `'readily'`, you're all good.
